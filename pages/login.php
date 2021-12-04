@@ -7,7 +7,6 @@ $error ="";
 
 
 if (isset($_POST['signin'])) {
-    
     $email = $_POST['your_email'];
     $password = $_POST['your_pass'];
     $cno = "";
