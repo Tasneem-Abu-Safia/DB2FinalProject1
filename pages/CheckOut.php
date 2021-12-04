@@ -7,6 +7,15 @@ if (!isset($_SESSION['username'])) {
 }
 
 $cno = $_GET['cno'];
+
+$sqlstart ="select count(cartno) as numINcart from cart where cno = $cno";
+$resstart=mysqli_query($conn,$sqlstart);
+$rowstart = $resstart->fetch_assoc();
+$count_cart = $rowstart['numINcart'];
+if ($count_cart != 0) {
+  
+
+
 $class = "";
 $msg ="";
 $aria_label="";
@@ -206,6 +215,10 @@ echo $canme;
 <?php
  $sql2 ="delete from cart where cno = $cno ";
  $result2 = mysqli_query($conn,$sql2);   
+      }
+      else {
+        header("location:search.php?cno=$cno");
+      }
 ?>
 
 </body>
