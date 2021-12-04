@@ -10,7 +10,7 @@ $ono = $_GET['ono'];
 $cno = $_GET['cno'];
 //عرض بيانات الاوردر من باقي الجداول 
 $s = "
-SELECT  parts.pno ,parts.pname,odetails.qty,parts.price,parts.olevel
+SELECT  parts.* ,odetails.qty
 FROM ((odetails
 INNER JOIN orders ON (odetails.ono = orders.ono and orders.cno = $cno ))
 INNER JOIN parts ON odetails.pno = parts.pno)

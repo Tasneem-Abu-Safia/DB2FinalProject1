@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 04, 2021 at 03:07 PM
+-- Generation Time: Dec 04, 2021 at 06:07 PM
 -- Server version: 10.4.14-MariaDB
 -- PHP Version: 7.2.34
 
@@ -72,14 +72,6 @@ CREATE TABLE `odetails` (
   `qty` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Dumping data for table `odetails`
---
-
-INSERT INTO `odetails` (`ono`, `pno`, `qty`) VALUES
-(54, 10601, 6),
-(54, 15996, 9);
-
 -- --------------------------------------------------------
 
 --
@@ -89,16 +81,9 @@ INSERT INTO `odetails` (`ono`, `pno`, `qty`) VALUES
 CREATE TABLE `orders` (
   `ono` int(5) NOT NULL,
   `cno` int(10) DEFAULT NULL,
-  `received` date DEFAULT NULL,
-  `shipped` date DEFAULT NULL
+  `received` datetime DEFAULT NULL,
+  `shipped` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `orders`
---
-
-INSERT INTO `orders` (`ono`, `cno`, `received`, `shipped`) VALUES
-(54, 14, '2021-12-04', '2021-12-04');
 
 -- --------------------------------------------------------
 
@@ -119,12 +104,11 @@ CREATE TABLE `parts` (
 --
 
 INSERT INTO `parts` (`pno`, `pname`, `qoh`, `price`, `olevel`) VALUES
-(0, 'Snow White', 30, '20.00', 7),
-(10012, 'CINDERELLA', 60, '10.00', 9),
-(10601, 'Sleeping Beauty', 44, '24.99', 12),
-(15896, 'BAMBI', 20, '13.00', 10),
-(15996, 'Land Before Time I', 41, '19.99', 16),
-(17756, 'Snow White', 30, '20.00', 7);
+(10012, 'CINDERELLA', 56, '10.00', 9),
+(10601, 'Sleeping Beauty', 37, '24.99', 12),
+(15896, 'BAMBI', 5, '13.00', 10),
+(15996, 'Land Before Time I', 35, '19.99', 16),
+(17756, 'Snow White', 22, '20.00', 7);
 
 --
 -- Indexes for dumped tables
@@ -175,7 +159,7 @@ ALTER TABLE `parts`
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `cartno` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `cartno` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
 
 --
 -- AUTO_INCREMENT for table `customers`
@@ -187,7 +171,7 @@ ALTER TABLE `customers`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `ono` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `ono` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- Constraints for dumped tables

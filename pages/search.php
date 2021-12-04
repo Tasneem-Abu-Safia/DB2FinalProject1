@@ -58,7 +58,7 @@ if (isset($_POST['addtocart'])) {
             $rr = mysqli_query($conn,$sql);
            
            
-            $date = date("Y-m-d");
+            $date = date("Y-m-d  h:i:s");
             $_SESSION['Firstreceived'] = $date;
         
            }

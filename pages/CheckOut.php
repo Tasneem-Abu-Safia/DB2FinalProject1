@@ -35,7 +35,7 @@ $r = mysqli_query($conn,$s);
 
 /////////////////
 //يضيف على جدول الاوردر للمشتري مع وقت البيع
-$_SESSION['ShippedDate'] = date("Y-m-d");
+$_SESSION['ShippedDate'] = date("Y-m-d  h:i:s");
 $R_date = "";
 if (isset($_SESSION['Firstreceived'])) {
   $R_date = $_SESSION['Firstreceived'];
