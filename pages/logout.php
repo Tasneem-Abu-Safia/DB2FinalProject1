@@ -1,0 +1,106 @@
+<?php
+session_start();
+/*session_destroy();
+setcookie("username",$email,time()-3600);
+setcookie("password",$password,time()-3600);
+header('location: login.php');*/
+
+include('sliderPages.php');
+require("../db.php");
+if (!isset($_SESSION['username'])) {
+    header("location:login.php");
+
+}
+$cno = $_GET['cno'];
+$sqlCart = "select count(distinct cno) as numCNO  from cart where cno = $cno";
+$result = mysqli_query($conn,$sqlCart);        
+$row = mysqli_fetch_assoc($result);
+$cnotable = $row['numCNO'];
+
+
+
+
+
+if (isset($_POST['submit'])) {
+   if (isset($_POST['logout'])) {
+       
+        $condition = $_POST['logout'];  
+    
+       if ($condition == 'checkout') {
+        header("location:CheckOut.php?cno=$cno");
+
+
+    }
+       elseif ($condition == 'save') {
+        session_destroy();
+        setcookie("username",$email,time()-3600);
+        setcookie("password",$password,time()-3600);
+        header('location: login.php');
+
+    }
+       elseif ($condition == 'empty') {
+        $sql ="delete from cart where cno = $cno ";
+        $result = mysqli_query($conn,$sql);   
+        session_destroy();
+        setcookie("username",$email,time()-3600);
+        setcookie("password",$password,time()-3600);
+        header('location: login.php');
+
+    }}
+    else {
+        echo "<script> alert('You Should select one!'); </script>" ;
+    }
+      
+
+
+    }
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+</head>
+<body>
+    <?php
+    if ($cnotable == 0) {
+        session_destroy();
+        setcookie("username",$email,time()-3600);
+        setcookie("password",$password,time()-3600);
+        header('location: login.php');
+    }
+    else {
+    ?>
+<div class="container" style="margin-left: 10%;
+    text-align: center;
+    margin-top: 5%;">
+    <h1>LogOut Page</h1><br><br>
+
+    <h3>Your Shopping Cart Has Items in it! <br>
+     Please choose on of the following options before logging out. </h3><br>
+<form action="" method="post">
+<div class="form-check">
+      <input type="radio" class="form-check-input" name="logout" id="checkout" value="checkout"> <label class="form-check-label" for="checkout">CheckOut         </label><br>
+      <input type="radio" class="form-check-input" name="logout" id="save" value="save"> <label class="form-check-label" for="save">Save Cart and LogOut</label><br>
+      <input type="radio" class="form-check-input" name="logout" id="empty" value="empty"> <label class="form-check-label" for="empty">Empty Cart and LogOut</label><br>
+     <br>
+    
+      <div class="z">
+            <div class="inner"></div>    
+          
+      <button  class="btn btn-lg btn-primary" type="submit" name="submit" >Submit</button> 
+      <button type="reset" name="submit" class="btn btn-lg btn-primary">Reset</button> 
+
+        </div>  
+        
+
+</form>
+</div>   
+
+<?php
+    }
+?>
+</body>
+</html>
+
+
+
