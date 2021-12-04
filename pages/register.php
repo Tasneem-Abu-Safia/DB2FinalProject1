@@ -3,6 +3,11 @@
 require("../db.php");
 $class = "";
 $error ="";
+/*
+Input صفحة انشاء حساب جديد من خلال الفورم ياخذ قيم 
+ويربط مع الداتا بيز ويخزنها في جدول اليوزر
+
+*/
 if (isset($_POST['submit'])) {
    
     $name= $_POST['name'];
@@ -13,24 +18,20 @@ if (isset($_POST['submit'])) {
     $phone=$_POST['phone'];
     $email=$_POST['email'];
     $pass=$_POST['pass'];
-    $s1 = "select cname from customers where cname = '".$name."' ";
-    $s2 = "select email from customers where email = '".$email."' ";
-
-    $r1 = mysqli_query($conn,$s1);
-   
+    //لفحص هل الايميل مستخدم مسبقا ام لا ؟
+    $s2 = "select email from customers where email = '".$email."' "; 
     $r2 = mysqli_query($conn,$s2);
 
-if (mysqli_num_rows($r1) == 0) {
     if (mysqli_num_rows($r2) == 0) {
-        if (strlen($zip) > 0 && strlen($zip) <= 5)  {
-            if (strlen($pass) >= 9 && strlen($pass) < 15)  {
+        if (strlen($zip) > 0 && strlen($zip) <= 5)  { // فحص قيمة المدخلة طولها من 1 حتى 5
+            if (strlen($pass) >= 9 && strlen($pass) < 15)  { //فحص الباسوورد بحيث يكون اكتر من 9 واقل من 15
             
-        
+      //customers تخزين اليوزر الجديد في جدول   
    $sql= "
     INSERT INTO customers(cname,street,city,state,zip,phone,email,password)
      VALUES ('$name','$street','$city','$state',$zip,'$phone','$email','$pass')";
      $result = mysqli_query($conn,$sql);
-     
+     //عرض رسائل فيها محتويات الارور الموجود
      if($result===FALSE) {
         echo '<style>#x{visibility: visible !important;}</style>';
         $class = "alert alert-danger";
@@ -57,14 +58,10 @@ else{
 
 }
 }
-else{
-    echo '<style>#x{visibility: visible !important;}</style>';
-    $class = "alert alert-danger";
-    $error = "Name already used , select another name";
-}
+
      
     
-      } 
+      
 
 ?>
 

@@ -1,12 +1,12 @@
 <?php
-include('sliderPages.php');
-require("../db.php");
+include('sliderPages.php'); // اظهار منيو على الجنب
+require("../db.php"); // كونيكشن على الداتا بيز
 session_start();
-if (!isset($_SESSION['username'])) {
+if (!isset($_SESSION['username'])) { // فحص هل موجود اليوزر بنفس السيشن , عمل تسجيل دخول والا بيرجعو ع صفحة لوجين
     header("location:login.php");
 
 }
-
+// حسب رقمه وعمل عرض للاسم في واجهة الصفحة customers تحديد اسم اليوزر من جدول 
 $cno = $_GET['cno'];
 $s = "select cname from customers where cno = $cno";
 $select = mysqli_query($conn,$s) ;

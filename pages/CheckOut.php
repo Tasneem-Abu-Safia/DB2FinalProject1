@@ -7,20 +7,19 @@ if (!isset($_SESSION['username'])) {
 }
 
 $cno = $_GET['cno'];
-
-$sqlstart ="select count(cartno) as numINcart from cart where cno = $cno";
-$resstart=mysqli_query($conn,$sqlstart);
-$rowstart = $resstart->fetch_assoc();
-$count_cart = $rowstart['numINcart'];
-if ($count_cart != 0) {
-  
-
-
 $class = "";
 $msg ="";
 $aria_label="";
 $xlink="";
 $total_cost = 0;
+//عند الضغط على هذه الصفحة لعرض الفاتورة يفحص هل يوجد لليوزر طلبات في جدول الكارت ام لا 
+// اذا ما كان في اوردر يعرض صفحة الفيديوز كلها حتى يختار اما اذا كان في اوردر يحسب الفاتورة الها
+$sqlstart ="select count(cartno) as numINcart from cart where cno = $cno";
+$resstart=mysqli_query($conn,$sqlstart);
+$rowstart = $resstart->fetch_assoc();
+$count_cart = $rowstart['numINcart'];
+if ($count_cart != 0) {
+
 //نعرض بيانات الفاتورة من الكارت قبل ما يفرغها
 $sql = "
 SELECT parts.pno ,parts.pname,parts.price , sum(cart.qty) as quntity
@@ -28,13 +27,12 @@ FROM cart INNER JOIN parts ON (cart.pno = parts.pno and cart.cno = $cno )
 group by parts.pname
 order by cart.pno;
 ";
-
 $result = mysqli_query($conn,$sql);
 $s = "select * from parts";
-$r = mysqli_query($conn,$s);
+$r = mysqli_query($conn,$s); // نعرضهم في جدول تحت
 
 /////////////////
-//يضيف على جدول الاوردر للمشتري مع وقت البيع
+//يضيف على جدول الاوردر مرة واحدة للمشتري مع وقت البيع
 $_SESSION['ShippedDate'] = date("Y-m-d  h:i:s");
 $R_date = "";
 if (isset($_SESSION['Firstreceived'])) {
@@ -66,6 +64,7 @@ $GLOBALS['pnoCart'] = $rows['pno'];
 $GLOBALS['qtyCart'] = $rows['qty'];
 $sql4 ="update parts set qoh = (qoh-$GLOBALS[qtyCart]) where pno = $GLOBALS[pnoCart]";
 $res4=mysqli_query($conn,$sql4);
+
 // odetails الاضافة على جدول 
 $sOdetails = "
 INSERT Into odetails (ono ,pno , qty) Values ($ono , $pnoCart , $qtyCart)";
@@ -190,8 +189,9 @@ echo $canme;
       </td>
       <td>
       <?php 
-     $GLOBALS['total_cost'] += ($row['quntity'] * $row['price']);
-      echo  ($row['quntity'] * $row['price']) ;?>
+      $DVDprice = $row['quntity'] * $row['price'];
+     $GLOBALS['total_cost'] += $DVDprice;
+      echo $DVDprice ;?>
       </td>
     </tr>
 
@@ -213,6 +213,7 @@ echo $canme;
     Please print a copy of the invoice for your records
 </div>
 <?php
+// حذف محتوى الكارت
  $sql2 ="delete from cart where cno = $cno ";
  $result2 = mysqli_query($conn,$sql2);   
       }

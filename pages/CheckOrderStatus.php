@@ -6,6 +6,7 @@ if (!isset($_SESSION['username'])) {
     header("location:login.php");
 
 }
+//عرض من جدول اوردر حالة الاوردر لليوزر ووقتها 
 $cno = $_GET['cno'];
 $s = "select * from orders where cno = $cno";
 $r = mysqli_query($conn,$s);
@@ -57,7 +58,10 @@ table th:last-child{
       ?>
     <tr>
       <th scope="row">
-       <a href="odetails.php?ono=<?php echo $row['ono']; ?>&cno=<?php echo $cno; ?>"> <?php echo $row['ono'] ?> </a>
+        <!--في حالة الضفط على رقم الاوردر يظهرلو بيناتات ومحتويات الاوردر --->
+       <a href="odetails.php?ono=<?php echo $row['ono']; ?>&cno=<?php echo $cno; ?>"> 
+       <?php echo $row['ono'] ?> 
+      </a>
       </th>
       <td><?php echo $row['received'] ?></td>
       <td><?php 

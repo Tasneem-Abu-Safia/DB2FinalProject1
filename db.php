@@ -1,3 +1,5 @@
+
+<!--DataBase Connection --->
 <?php
 $conn = mysqli_connect("localhost","root","","db2finalproject");
 if (!$conn) {

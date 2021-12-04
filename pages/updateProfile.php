@@ -1,6 +1,7 @@
 <?php
 include('sliderPages.php');
 require("../db.php");
+
 $class = "";
 $msg ="";
 $pass = "";
@@ -12,6 +13,7 @@ if (!isset($_SESSION['username'])) {
     header("location:login.php");
 
 }
+// عرض بيانات اليوزر حسب الموجود في الجدول
 $cno = $_GET['cno'];
   $s = "select * from customers where cno = $cno";
   $r = mysqli_query($conn,$s);
@@ -27,6 +29,8 @@ while ($row = mysqli_fetch_assoc($r)) {
     $GLOBALS['pass']=$row['password'];
  
 }
+///////////////////////
+// ياخذ قيمة الموجود في الانبت ويعمل تعديل على الجدول بعد فحص قيمة باسوورد متوافق ام لا مع الموجود
 if (isset($_POST['submit'])) {
    
     $name= $_POST['name'];
@@ -38,6 +42,7 @@ if (isset($_POST['submit'])) {
     $email=$_POST['email'];
     $oldpass=$_POST['oldpass'];
     $newpass=$_POST['newpass'];
+    // يقارن الباسوورد القديم مع الجدول لاتمام عملية التعديل وفي حال ادخل باسوورد جديد بيفحص القديم والجديد اكبر من 9
     if (strcmp($GLOBALS['pass'], $oldpass) == 0   ) {
         if (strlen($newpass) >= 9) {
             $oldpass = $newpass;

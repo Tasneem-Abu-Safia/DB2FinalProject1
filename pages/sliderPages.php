@@ -1,7 +1,5 @@
+<!-- محتوى المنيو بار المشترك بين كل الصفحات--->
 <?php
-
-
-
 $cno = $_GET['cno'];
 ?>
 <!DOCTYPE html>
@@ -26,14 +24,11 @@ $cno = $_GET['cno'];
 
                 <ul class="list-unstyled components">
                     <p>Customer Menu</p>
-              
-                    <li>
-                        <a href="CheckOut.php?cno=<?php echo $cno; ?>">CheckOut</a>
-                        
+                <li>
+                        <a href="search.php?cno=<?php echo $cno; ?>">List ALL (Search By Keyword)</a>
                     </li>
-                    <li>
-                        <a href="CheckOrderStatus.php?cno=<?php echo $cno; ?>">Check Order Status</a>
-                    </li>
+                
+                   
                     <li>
                         <a href="updateProfile.php?cno=<?php echo $cno; ?>">Update Profile</a>
                     </li>
@@ -41,7 +36,11 @@ $cno = $_GET['cno'];
                         <a href="viewEditCart.php?cno=<?php echo $cno; ?>">View/Edit Cart</a>
                     </li>
                     <li>
-                        <a href="search.php?cno=<?php echo $cno; ?>">Search By Keyword</a>
+                        <a href="CheckOrderStatus.php?cno=<?php echo $cno; ?>">Check Order Status</a>
+                    </li>
+                    <li>
+                        <a href="CheckOut.php?cno=<?php echo $cno; ?>">CheckOut</a>
+                        
                     </li>
                     <li>
                         <a href="logout.php?cno=<?php echo $cno; ?>">Logout</a>

@@ -6,52 +6,59 @@ if (!isset($_SESSION['username'])) {
   header("location:login.php");
 
 }
+// CSS متغيرات ل  
 $class = "";
 $msg ="";
 $aria_label="";
 $xlink="";
-$cno = $_GET['cno'];
-$numCNO = 0 ;
-$qtyCart = 0;
+/********************/
+$cno = $_GET['cno']; // رقم اليوزر تم اراساله عبر الرابط
+$numCNO = 0 ; //تكرار رقم اليوزر في جدول الكارد
+$qtyCart = 0; //لوضع الكمية المدخلة من اليوزر حسب جدول الكارد
+/********************/
+
+//  لعرض محتويات جدول البارت داخل الجدول
 $s = "select * from parts";
 $r = mysqli_query($conn,$s);
+/********************/
+/*  DVD  في حالة البحث عن 
+   ياخد القيمة المراد البحث عنها ومن جدول البارت يبحث حسب الاسم
+*/
 if (isset($_POST['find'])) {
     $key= $_POST['key'];
-    if (strlen($key) == 0) {
-        $s = "select * from parts";
-        $r = mysqli_query($conn,$s);
-    }
-    else{
+  
         $s = "select * from parts where pname LIKE '%$key%'";
         $r = mysqli_query($conn,$s);
     }
+/********************/
 
-}
-if (isset($_POST['addtocart'])) {
-  
 
-    $arr=array();
-    $arr=count($_POST['qty']);
+if (isset($_POST['addtocart'])) { //يضغط على الاضافة 
+    $arr=array(); // انشاء اراي
+    $arr=count($_POST['qty']); // input ياخد حجم الاراي حسب عدد 
     for($i=0;$i<$arr;$i++)
     {
+        //select * from parts
         $row = mysqli_fetch_assoc($r);
-
-      
-       $Pid=$row['pno'];
-       $Qinput = $_POST['qty'][$i];
-       $sql1= "select * from parts WHERE pno=$Pid";
+       $Pid=$row['pno']; //   من جدول بارتDVDياخد رقم 
+       $Qinput = $_POST['qty'][$i]; // يمر على الانبوت وحدة وحدة وياخد قيمتها المدخلة
+       $sql1= "select qoh from parts WHERE pno=$Pid"; //حسب جدول البارت DVDتحديد كمية هذا ال  
        $result = mysqli_query($conn,$sql1);        
-        $row = mysqli_fetch_assoc($result);
-        $qtytable = $row['qoh'];
-       if ($Qinput > 0 && $Qinput <= $qtytable) {
+        $row = $result->fetch_assoc();
+        $qtytable = $row['qoh']; // الكمية من الجدول البارت
+       if ($Qinput > 0 && $Qinput <= $qtytable) { //يفحص الكمية المدخلة اكبر من صفر واقل من الاصلية
 
+         /* DVDمن خلال السيلكت على جدول الكارت يحدد عدد مرات وجود اليوزر نفسو لنفس ال
+         بحيث لو اول مرة يختارو يعمل اضافة جديدة اما اذا موجود مسبقا بالكارد فقط يعدل الكمية الموجودة بالزيادة عليها
+         */
          $sqlCart = "select count(distinct cno) as numCNO , qty  from cart where cno = $cno and pno =$Pid ";
          $resultCart = mysqli_query($conn,$sqlCart);        
          while ($rowCart = mysqli_fetch_assoc($resultCart)) {
                  $numCNO = $rowCart['numCNO'];
                  $qtyCart = $rowCart['qty'];
          }
-           if ($numCNO == 0) {
+
+           if ($numCNO == 0) { // حالة اول مرة يختار اضافة جديدة 
             
             $sql = "
             INSERT Into cart (cno	,pno ,qty) VALUES ($cno,$Pid,$Qinput)";
@@ -59,24 +66,24 @@ if (isset($_POST['addtocart'])) {
            
            
             $date = date("Y-m-d  h:i:s");
-            $_SESSION['Firstreceived'] = $date;
+            $_SESSION['Firstreceived'] = $date; //يحدد تاريخ ووقت الاختيار 
         
            }
-           elseif ($numCNO >= 1) {
+           elseif ($numCNO >= 1) { // حالة وجوده مسبقا ف بيعمل تعديل على الكمية فقط
             $_SESSION['received'] = $_SESSION['Firstreceived'] ;
             $sql = "
             update cart set qty = ( $qtyCart+$Qinput ) where cno = $cno and pno =$Pid;";
             $rr = mysqli_query($conn,$sql);
            }
+           //عرض رسالة الاضافة بنجاح
           echo '<style>#x{visibility: visible !important;}</style>';
           $GLOBALS['class'] = "alert alert-success d-flex align-items-center";
-      $GLOBALS['msg'] = 'Successful Addition';
-      $GLOBALS['aria_label'] = 'Success:';
-      $GLOBALS['xlink'] = '#check-circle-fill';
+          $GLOBALS['msg'] = 'Successful Addition';
+          $GLOBALS['aria_label'] = 'Success:';
+          $GLOBALS['xlink'] = '#check-circle-fill';
 
-        
-
-       }
+         }
+         //فحص القيمة المدخلة اذا اقل او اكتر من الموجودة في جدول البارت واظهار رسالة خطا
        elseif($Qinput < 0 || $Qinput > $qtytable){
         echo '<style>#x{visibility: visible !important;}</style>';
         $GLOBALS['class'] = "alert alert-danger d-flex align-items-center";
@@ -216,6 +223,7 @@ if (isset($_POST['addtocart'])) {
 
 
 <script>
+  //كود جافا سكربت لعرض رسالة الخطا او الصح لوقت معين واختفاءها
   setTimeout(function(){
     document.getElementById('x').style.display = 'none';
    

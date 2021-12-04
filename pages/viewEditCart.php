@@ -12,15 +12,16 @@ $msg ="";
 $aria_label="";
 $xlink="";
 $total_cost = 0;
+// عرض مشتريات اليوزر من جدول الكارت وبياناتها جدول البارت بعمل جوين بين الجدولين لليوزر نفسو فقط
 $sql = "
-SELECT parts.pno ,parts.pname,parts.price , cart.qty as quntity
+SELECT parts.* , cart.qty as quntity
 FROM cart INNER JOIN parts ON (cart.pno = parts.pno and cart.cno = $cno )
 group by parts.pname
 order by cart.pno;
 ";
-$result = mysqli_query($conn,$sql);
-$s = "select * from parts";
-$r = mysqli_query($conn,$s);
+$result = mysqli_query($conn,$sql); // تنفيذها تحت بالجدول
+//////////////////////
+// نفس فكرة الاضافة في صفحة السيرش لكن هنا تعديل
 if (isset($_POST['editcart'])) {
   
 
@@ -48,9 +49,7 @@ if (isset($_POST['editcart'])) {
       $GLOBALS['aria_label'] = 'Success:';
       $GLOBALS['xlink'] = '#check-circle-fill';
 
-         /* $sql2 = "
-          Update parts set qoh = ($qtytable - $Qinput) where pno = $Pid";
-          $rr = mysqli_query($conn,$sql2);*/
+    
 
        }
        elseif($Qinput < 0 || $Qinput > $qtytable){
@@ -150,7 +149,7 @@ if (isset($_POST['editcart'])) {
   </thead>
   <tbody>
  <?php
-  
+  // عرض بيانات في جدول
       while ($row = mysqli_fetch_assoc($result)) {
       ?>
     <tr>
@@ -166,8 +165,9 @@ if (isset($_POST['editcart'])) {
       </td>
       <td>
       <?php 
-     $GLOBALS['total_cost'] += ($row['quntity'] * $row['price']);
-      echo  ($row['quntity'] * $row['price']) ;?>
+      $DVDprice = $row['quntity'] * $row['price'];
+     $GLOBALS['total_cost'] += ($DVDprice);// لحساب السعر الكلي كل مرة بنجمع سعر كل واحد
+      echo  $DVDprice ;?>
       </td>
     </tr>
 
