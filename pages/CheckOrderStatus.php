@@ -47,6 +47,7 @@ table th:last-child{
   <thead class="table-secondary">
     <tr>
       <th scope="col">ONO</th>
+      <th scope="col">Total Price</th>
       <th scope="col">Received</th>
       <th scope="col">Shipped</th>
       
@@ -63,6 +64,7 @@ table th:last-child{
        <?php echo $row['ono'] ?> 
       </a>
       </th>
+      <td><?php echo $row['totalPrice'] ?></td>
       <td><?php echo $row['received'] ?></td>
       <td><?php 
       if ($row['shipped'] == '0000-00-00 00:00:00') {

@@ -45,13 +45,15 @@ elseif(isset($_SESSION['received'])){
   $sOrders = "
   INSERT Into orders (cno,received,shipped) Values ($cno,'$R_date','$_SESSION[ShippedDate]')";
   $rOrders = mysqli_query($conn,$sOrders);
+  $ono =  mysqli_insert_id($conn);
+
 //////////////////////
 
 //odetails هنا من جدول الاوردر يحدد رقم الاوردر الخاص باليوزر سواء للطباعة بالفاتورة او للتخزين بجدول 
-$sql3 ="select ono from orders where cno = $cno  ORDER BY ono DESC LIMIT 1";
+/*$sql3 ="select ono from orders where cno = $cno  ORDER BY ono DESC LIMIT 1";
 $res3=mysqli_query($conn,$sql3);
 $row3 = $res3->fetch_assoc();
-$ono = $row3['ono'];
+$ono = $row3['ono'];*/
 /////////////////////
 
 // هنا يعدل كمية الفديوز الاصلية يطرح منها عدد المطلوب
@@ -213,6 +215,11 @@ echo $canme;
     Please print a copy of the invoice for your records
 </div>
 <?php
+
+  $sOrders = "
+  Update orders set totalPrice = $GLOBALS[total_cost] where ono = $ono ";
+  $rOrders = mysqli_query($conn,$sOrders);
+  $ono =  mysqli_insert_id($conn);
 // حذف محتوى الكارت
  $sql2 ="delete from cart where cno = $cno ";
  $result2 = mysqli_query($conn,$sql2);   
