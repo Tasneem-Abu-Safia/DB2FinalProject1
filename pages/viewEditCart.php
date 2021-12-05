@@ -19,7 +19,7 @@ FROM cart INNER JOIN parts ON (cart.pno = parts.pno and cart.cno = $cno )
 group by parts.pname
 order by cart.pno;
 ";
-$result = mysqli_query($conn,$sql); // تنفيذها تحت بالجدول
+$result2 = mysqli_query($conn,$sql); // تنفيذها تحت بالجدول
 //////////////////////
 // نفس فكرة الاضافة في صفحة السيرش لكن هنا تعديل
 if (isset($_POST['editcart'])) {
@@ -29,10 +29,10 @@ if (isset($_POST['editcart'])) {
     $arr=count($_POST['qty']);
     for($i=0;$i<$arr;$i++)
     {
-        $row = mysqli_fetch_assoc($r);
+        $row2 = mysqli_fetch_assoc($result2);
 
        $qtytable= 0; 
-       $Pid=$row['pno'];
+       $Pid=$row2['pno'];
        $Qinput = $_POST['qty'][$i];
        $sql= "select * from parts WHERE pno=$Pid";
        $result = mysqli_query($conn,$sql);        
@@ -150,7 +150,7 @@ if (isset($_POST['editcart'])) {
   <tbody>
  <?php
   // عرض بيانات في جدول
-      while ($row = mysqli_fetch_assoc($result)) {
+      while ($row = mysqli_fetch_assoc($result2)) {
       ?>
     <tr>
       <th scope="row">

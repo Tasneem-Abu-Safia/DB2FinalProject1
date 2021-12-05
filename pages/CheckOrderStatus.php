@@ -65,7 +65,7 @@ table th:last-child{
       </th>
       <td><?php echo $row['received'] ?></td>
       <td><?php 
-      if ($row['shipped'] == '0000-00-00') {
+      if ($row['shipped'] == '0000-00-00 00:00:00') {
         echo 'Not Yet Shipped';
       }
       else{
