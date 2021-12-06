@@ -16,10 +16,12 @@ $cno = $_GET['cno']; // رقم اليوزر تم اراساله عبر الرا�
 $numCNO = 0 ; //تكرار رقم اليوزر في جدول الكارد
 $qtyCart = 0; //لوضع الكمية المدخلة من اليوزر حسب جدول الكارد
 /********************/
+   //  لعرض محتويات جدول البارت داخل الجدول
 
-//  لعرض محتويات جدول البارت داخل الجدول
-$s = "select * from parts";
-$r = mysqli_query($conn,$s);
+   $s = "select * from parts where qoh > 0";
+   $resultTotable= mysqli_query($conn,$s);
+
+ 
 /********************/
 /*  DVD  في حالة البحث عن 
    ياخد القيمة المراد البحث عنها ومن جدول البارت يبحث حسب الاسم
@@ -27,75 +29,86 @@ $r = mysqli_query($conn,$s);
 if (isset($_POST['find'])) {
     $key= $_POST['key'];
   
-        $s = "select * from parts where pname LIKE '%$key%'";
-        $r = mysqli_query($conn,$s);
+        $GLOBALS['s'] = "select * from parts where pname LIKE '%$key%' and qoh > 0";
+        $resultTotable= mysqli_query($conn,$s);
+
     }
+
 /********************/
 
 
 if (isset($_POST['addtocart'])) { //يضغط على الاضافة 
-    $arr=array(); // انشاء اراي
-    $arr=count($_POST['qty']); // input ياخد حجم الاراي حسب عدد 
-    for($i=0;$i<$arr;$i++)
-    {
-        //select * from parts
-        $row = mysqli_fetch_assoc($r);
-       $Pid=$row['pno']; //   من جدول بارتDVDياخد رقم 
-       $Qinput = $_POST['qty'][$i]; // يمر على الانبوت وحدة وحدة وياخد قيمتها المدخلة
-       $sql1= "select qoh from parts WHERE pno=$Pid"; //حسب جدول البارت DVDتحديد كمية هذا ال  
-       $result = mysqli_query($conn,$sql1);        
-        $row = $result->fetch_assoc();
-        $qtytable = $row['qoh']; // الكمية من الجدول البارت
-       if ($Qinput > 0 && $Qinput <= $qtytable) { //يفحص الكمية المدخلة اكبر من صفر واقل من الاصلية
-
-         /* DVDمن خلال السيلكت على جدول الكارت يحدد عدد مرات وجود اليوزر نفسو لنفس ال
-         بحيث لو اول مرة يختارو يعمل اضافة جديدة اما اذا موجود مسبقا بالكارد فقط يعدل الكمية الموجودة بالزيادة عليها
-         */
-         $sqlCart = "select count(distinct cno) as numCNO , qty  from cart where cno = $cno and pno =$Pid ";
-         $resultCart = mysqli_query($conn,$sqlCart);        
-         while ($rowCart = mysqli_fetch_assoc($resultCart)) {
-                 $numCNO = $rowCart['numCNO'];
-                 $qtyCart = $rowCart['qty'];
-         }
-
-           if ($numCNO == 0) { // حالة اول مرة يختار اضافة جديدة 
+   //Key يفحص كل انبوت حسب 
+  while ($rowsTable = mysqli_fetch_assoc($resultTotable)) {
+     $pno = $rowsTable['pno']; //من جدول الداتا بيز ناخد رقم الفيديو
+     $totalQuntity = $rowsTable['qoh'];//من الداتا بيز ناخد الكمية الكلية
+     if (isset($_POST['qty'][$pno])) { // في حال وضع كمية داخل الانبوت لرقم الفيديو بنضيف
+      $Qinput = $_POST['qty'][$pno];
+      if ($totalQuntity != 0) {    
+      if ($Qinput > 0 && $Qinput <= $totalQuntity) {
+        $sqlCart = "select count(distinct cno) as numCNO , qty  from cart where cno = $cno and pno =$pno ";
+        $resultCart = mysqli_query($conn,$sqlCart);        
+        while ($rowCart = mysqli_fetch_assoc($resultCart)) {
+                $numCNO = $rowCart['numCNO'];
+                $qtyCart = $rowCart['qty'];
+        }
+              
+        if ($numCNO == 0) { // حالة اول مرة يختار اضافة جديدة 
             
-            $sql = "
-            INSERT Into cart (cno	,pno ,qty) VALUES ($cno,$Pid,$Qinput)";
-            $rr = mysqli_query($conn,$sql);
-           
-           
-            $date = date("Y-m-d  h:i:s");
-            $_SESSION['Firstreceived'] = $date; //يحدد تاريخ ووقت الاختيار 
-        
-           }
-           elseif ($numCNO >= 1) { // حالة وجوده مسبقا ف بيعمل تعديل على الكمية فقط
-            $_SESSION['received'] = $_SESSION['Firstreceived'] ;
-            $sql = "
-            update cart set qty = ( $qtyCart+$Qinput ) where cno = $cno and pno =$Pid;";
-            $rr = mysqli_query($conn,$sql);
-           }
-           //عرض رسالة الاضافة بنجاح
-          echo '<style>#x{visibility: visible !important;}</style>';
-          $GLOBALS['class'] = "alert alert-success d-flex align-items-center";
-          $GLOBALS['msg'] = 'Successful Addition';
-          $GLOBALS['aria_label'] = 'Success:';
-          $GLOBALS['xlink'] = '#check-circle-fill';
-
+          $sql = "
+          INSERT Into cart (cno	,pno ,qty) VALUES ($cno,$pno,$Qinput)";
+          $rr = mysqli_query($conn,$sql);
+                    //نطرح الكمية المحددة من الكمية الكلية لجدول البارت
+          $sql4 ="update parts set qoh = (qoh-$Qinput) where pno = $pno";
+          $res4=mysqli_query($conn,$sql4);
+          
+          $date = date("Y-m-d  h:i:s");
+          $_SESSION['Firstreceived'] = $date; //يحدد تاريخ ووقت الاختيار 
+      
          }
-         //فحص القيمة المدخلة اذا اقل او اكتر من الموجودة في جدول البارت واظهار رسالة خطا
-       elseif($Qinput < 0 || $Qinput > $qtytable){
+         elseif ($numCNO >= 1) { // حالة وجوده مسبقا ف بيعمل تعديل على الكمية فقط
+          $_SESSION['received'] = $_SESSION['Firstreceived'] ;
+          $sql = "
+          update cart set qty = ( $qtyCart+$Qinput ) where cno = $cno and pno =$pno;";
+          $rr = mysqli_query($conn,$sql);
+                    //نطرح الكمية المحددة من الكمية الكلية لجدول البارت
+
+          $sql4 ="update parts set qoh = (qoh-$Qinput) where pno = $pno";
+          $res4=mysqli_query($conn,$sql4);
+         }
+         //عرض رسالة الاضافة بنجاح
+        echo '<style>#x{visibility: visible !important;}</style>';
+        $GLOBALS['class'] = "alert alert-success d-flex align-items-center";
+        $GLOBALS['msg'] = 'Successful Addition';
+        $GLOBALS['aria_label'] = 'Success:';
+        $GLOBALS['xlink'] = '#check-circle-fill';
+
+           
+
+      }elseif($Qinput < 0 || $Qinput > $totalQuntity){
         echo '<style>#x{visibility: visible !important;}</style>';
         $GLOBALS['class'] = "alert alert-danger d-flex align-items-center";
-        $GLOBALS['msg']= 'select quntity less than '.$qtytable;
+        $GLOBALS['msg']= 'select quntity less than '.$totalQuntity;
         $GLOBALS['aria_label'] = 'Danger:';
         $GLOBALS['xlink'] = '#exclamation-triangle-fill';
 
        }
-       
+    
+    }
+    else{
+      echo '<style>#x{visibility: visible !important;}</style>';
+      $GLOBALS['class'] = "alert alert-danger d-flex align-items-center";
+      $GLOBALS['msg']= 'This DVD is Finished';
+      $GLOBALS['aria_label'] = 'Danger:';
+      $GLOBALS['xlink'] = '#exclamation-triangle-fill';
+
+     }
+    }
     }
 
-}
+  }
+$resultTotable= mysqli_query($conn,$s);
+
 
 ?>
 <html>
@@ -163,7 +176,7 @@ if (isset($_POST['addtocart'])) { //يضغط على الاضافة
     <form action="" method ="post">
 <h3 style="    text-align: initial;
     font-size: 19px;
-    padding-top: 24px;">Search by KeyWord :</h3>
+    padding-top: 24px;">Search by KeyWord : <?php print_r($_POST); ?></h3>
 <div class="form-group form-button" >
                        
 <input type="text" id="myInput" name="key" style="    display: inline;" placeholder="Search for names.." >
@@ -185,18 +198,18 @@ if (isset($_POST['addtocart'])) { //يضغط على الاضافة
   <tbody>
   <?php
   
-      while ($row = mysqli_fetch_assoc($r)) {
+      while ($rowsTable = mysqli_fetch_assoc($resultTotable)) {
       ?>
     <tr>
       <th scope="row">
-      <?php echo $row['pno'] ?>
+      <?php echo $rowsTable['pno'] ?>
       </th>
-      <td><?php echo $row['pname'] ?></td>
+      <td><?php echo $rowsTable['pname'] ?></td>
       <td>
-      <?php echo $row['price'] ?>
+      <?php echo $rowsTable['price'] ?>
       </td>
       <td style="width: 20%;">
-      <input type="number" id=" <?php echo $row['pno'] ?>" name="qty[]">
+      <input type="number" id=" <?php echo $rowsTable['pno'] ?>" name="qty[<?php echo $rowsTable['pno'] ?>]">
 
       </td>
     </tr>

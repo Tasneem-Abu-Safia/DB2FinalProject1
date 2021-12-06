@@ -56,7 +56,6 @@ $row3 = $res3->fetch_assoc();
 $ono = $row3['ono'];*/
 /////////////////////
 
-// هنا يعدل كمية الفديوز الاصلية يطرح منها عدد المطلوب
 $sCart = "select pno , qty from cart where cno = $cno ";
 $rCart = mysqli_query($conn,$sCart);
 $pnoCart = "";
@@ -64,8 +63,7 @@ $qtyCart = "";
 while ($rows = mysqli_fetch_assoc($rCart)) {
 $GLOBALS['pnoCart'] = $rows['pno'];
 $GLOBALS['qtyCart'] = $rows['qty'];
-$sql4 ="update parts set qoh = (qoh-$GLOBALS[qtyCart]) where pno = $GLOBALS[pnoCart]";
-$res4=mysqli_query($conn,$sql4);
+
 
 // odetails الاضافة على جدول 
 $sOdetails = "

@@ -27,7 +27,7 @@ if (isset($_POST['submit'])) {// في حالة عمل سبمت
        
         $condition = $_POST['logout'];  // يحدد اي الخيارات تم اختيارها
     
-       if ($condition == 'checkout') { //في حالة اراد يعمل فاتورة بيروح على صفحة الفاتورة
+       if ($condition === 'checkout') { //في حالة اراد يعمل فاتورة بيروح على صفحة الفاتورة
         header("location:CheckOut.php?cno=$cno");
 
 
@@ -39,7 +39,21 @@ if (isset($_POST['submit'])) {// في حالة عمل سبمت
         header('location: login.php');
 
     }
-       elseif ($condition == 'empty') { // في حالة اختار تفريغ للكارت بيحذفهم من جدول الكارت
+       elseif ($condition == 'empty') { 
+           // في حالة اختار تفريغ للكارت  بيرجع الكمية المحجوزة الى الكلية  
+        $sCart = "select pno , qty from cart where cno = $cno ";
+        $rCart = mysqli_query($conn,$sCart);
+        $pnoCart = "";
+        $qtyCart = "";
+        while ($rows = mysqli_fetch_assoc($rCart)) {
+        $GLOBALS['pnoCart'] = $rows['pno'];
+        $GLOBALS['qtyCart'] = $rows['qty'];
+        
+        $sOdetails = " update parts set qoh = (qoh+$qtyCart) where pno = $pnoCart";
+        $rOdetails = mysqli_query($conn,$sOdetails);
+        }
+           // في حالة اختار تفريغ للكارت بيحذفهم من جدول الكارت
+
         $sql ="delete from cart where cno = $cno ";
         $result = mysqli_query($conn,$sql);   
         session_destroy();

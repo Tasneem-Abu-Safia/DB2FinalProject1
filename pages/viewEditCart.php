@@ -23,46 +23,46 @@ $result2 = mysqli_query($conn,$sql); // تنفيذها تحت بالجدول
 //////////////////////
 // نفس فكرة الاضافة في صفحة السيرش لكن هنا تعديل
 if (isset($_POST['editcart'])) {
-  
+  $s = "select * from cart where qty > 0";
+  $resultTotable= mysqli_query($conn,$s);
+  while ($rowsTable = mysqli_fetch_assoc($resultTotable)) {
+    $pnoCart = $rowsTable['pno']; //من جدول الداتا بيز  كارت ناخد رقم الفيديو
+    $CartQuntity = $rowsTable['qty'];//من الداتا بيز ناخد الكمية من جدول الكارت 
+    if (isset($_POST['qty'][$pnoCart])) { // في حال وضع كمية داخل الانبوت لرقم الفيديو بنضيف
+      $Qinput = $_POST['qty'][$pnoCart]; // القيمة الجديدة
+      $newValue = ($CartQuntity - $Qinput) ; //  الطرح بين القييمة القديمة والمدخلة حتى يزودها على جدول البارت 
+      $sql1= "select qoh from parts WHERE pno=$pnoCart"; //حسب جدول البارت DVDتحديد كمية هذا ال  
+      $result = mysqli_query($conn,$sql1);        
+       $row = $result->fetch_assoc();
+       $totalPart = $row['qoh'];
+          // نفحص كانو رجع القيمة القديمة من الكارت لجدول البارت وبيصير الفحص عليها ككل مقارنة بالمدخل الجديد
+          $condition =$totalPart + $CartQuntity;
+          if ($Qinput >= 0 && $Qinput < $condition) {
+    $sql = "
+            update cart set qty = $Qinput where cno = $cno and pno =$pnoCart";
+            $rr = mysqli_query($conn,$sql);
+            $sql2 = "
+            update parts set qoh = ( $totalPart  + $newValue) where  pno =$pnoCart";
+             $r2 = mysqli_query($conn,$sql2);
 
-    $arr=array();
-    $arr=count($_POST['qty']);
-    for($i=0;$i<$arr;$i++)
-    {
-        $row2 = mysqli_fetch_assoc($result2);
-
-       $qtytable= 0; 
-       $Pid=$row2['pno'];
-       $Qinput = $_POST['qty'][$i];
-       $sql= "select * from parts WHERE pno=$Pid";
-       $result = mysqli_query($conn,$sql);        
-        $row = mysqli_fetch_assoc($result);
-        
-        $qtytable = $row['qoh'];
-       if ($Qinput > 0 && $Qinput <= $qtytable) {
-          $sql = "
-          update cart set qty = $Qinput where cno = $cno and pno =$Pid";
-          $rr = mysqli_query($conn,$sql);
-          echo '<style>#x{visibility: visible !important;}</style>';
-          $GLOBALS['class'] = "alert alert-success d-flex align-items-center";
-      $GLOBALS['msg'] = 'Successful Addition';
-      $GLOBALS['aria_label'] = 'Success:';
-      $GLOBALS['xlink'] = '#check-circle-fill';
-
-    
-
-       }
-       elseif($Qinput < 0 || $Qinput > $qtytable){
-        echo '<style>#x{visibility: visible !important;}</style>';
-        $GLOBALS['class'] = "alert alert-danger d-flex align-items-center";
-        $GLOBALS['msg']= 'Your QTY should be less '.$qtytable;
-        $GLOBALS['aria_label'] = 'Danger:';
-        $GLOBALS['xlink'] = '#exclamation-triangle-fill';
-
-       }
-       
+             echo '<style>#x{visibility: visible !important;}</style>';
+             $GLOBALS['class'] = "alert alert-success d-flex align-items-center";
+         $GLOBALS['msg'] = 'Successful Update';
+         $GLOBALS['aria_label'] = 'Success:';
+         $GLOBALS['xlink'] = '#check-circle-fill';
+          }
+          elseif($Qinput < 0 || $Qinput > $condition){
+            echo '<style>#x{visibility: visible !important;}</style>';
+            $GLOBALS['class'] = "alert alert-danger d-flex align-items-center";
+            $GLOBALS['msg']= 'Your QTY should be less '.$condition;
+            $GLOBALS['aria_label'] = 'Danger:';
+            $GLOBALS['xlink'] = '#exclamation-triangle-fill';
+           }
     }
-
+  }
+  
+  $sql= "Delete  from cart WHERE qty = 0";
+  $result = mysqli_query($conn,$sql);   
 }
 
 ?>
@@ -131,7 +131,7 @@ if (isset($_POST['editcart'])) {
     <form action="" method ="post">
 <h3 style="    text-align: center;
     font-size: 19px;
-    padding-top: 24px;">Cart Content</h3>
+    padding-top: 24px;">Cart Content <?php print_r($_POST); ?></h3>
 
     
 <table class="table"  id="myTable">
@@ -161,7 +161,7 @@ if (isset($_POST['editcart'])) {
       <?php echo $row['price'] ?>
       </td>
       <td style="width: 20%;">
-      <input type="number" id=" <?php echo $row['pno'] ?>" name="qty[]" placeholder = " <?php echo $row['quntity'] ?>">
+      <input type="number" id=" <?php echo $row['pno'] ?>" name="qty[<?php echo $row['pno'] ?>]" placeholder = " <?php echo $row['quntity'] ?>">
       </td>
       <td>
       <?php 
